@@ -14,9 +14,16 @@ Vagrant.configure("2") do |config|
 		v.memory = 8196
         v.cpus = 2
 #	v.gui = true
-#	v.name = "MyVagrantBox"
+#	v.name = "LinuxDockerVmBox"
   end
+
+  # config.trigger.after :up do |trigger|
+  #   trigger.name = "Hello world"
+  #   trigger.info = "I am running after vagrant up!!"
+    
+  # end
   
+  config.vm.provision :shell, :privileged => true, :path => "up.sh", :run => "always"
   config.vm.provision :shell, :privileged => true, :path => "setup.sh"
   
 end
