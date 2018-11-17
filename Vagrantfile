@@ -10,6 +10,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/xenial64"
   config.vm.box_url = "https://app.vagrantup.com/ubuntu/boxes/xenial64"
   
+  config.vm.network "forwarded_port", guest: 27017, host: 27017
   config.vm.provider "virtualbox" do |v|
 		v.memory = 8196
         v.cpus = 2
@@ -23,7 +24,7 @@ Vagrant.configure("2") do |config|
     
   # end
   
-  config.vm.provision :shell, :privileged => true, :path => "up.sh", :run => "always"
   config.vm.provision :shell, :privileged => true, :path => "setup.sh"
+  config.vm.provision :shell, :privileged => true, :path => "up.sh", :run => "always"
   
 end
