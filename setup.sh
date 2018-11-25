@@ -58,7 +58,9 @@ echo restarting duftfinder
 docker restart duftfinder
 docker ps
 
+echo *************** provisioning mongo database ************
 
+#mongo 127.0.0.1:27017/duftfinder --eval 'var document = {name  : "document_name",title : "document_title",};db.MyCollection.insert(document);'
 
 
 
