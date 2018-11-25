@@ -29,17 +29,17 @@ add-apt-repository \
    $(lsb_release -cs) \
    stable"
    
-echo *********** install docker *******************
+echo *********** install docker ***********
 apt-get update
 apt-get -qq --allow-unauthenticated install docker-ce
 
-echo *********** get mongo docker image *******************
+echo *********** get mongo docker image ***********
 
 docker pull mongo
 
 docker run -p 27017:27017 --name duftfinder -d mongo
 
-echo **************** install mongo ****************
+echo "*********** install mongo tools (only used to access mongo on the docker image) ***********"
 
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4
 echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/4.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.0.list
@@ -54,13 +54,72 @@ echo "mongodb-org-tools hold" | sudo dpkg --set-selections
 
 echo **************** end mongo installed *****************
 
+echo "*********** install netcat ***********"
+apt install netcat -y
+
+sleep 7s
+
 echo restarting duftfinder
 docker restart duftfinder
 docker ps
 
 echo *************** provisioning mongo database ************
 
-#mongo 127.0.0.1:27017/duftfinder --eval 'var document = {name  : "document_name",title : "document_title",};db.MyCollection.insert(document);'
+echo "Waiting for mongo to be ready:"
+
+until mongo --eval "print(\"waited for connection\")"
+  do
+    sleep 10s
+  done
+
+# until nc -z localhost 27017
+# do
+#     sleep 5s
+# done
+
+echo "counting Role in database duftfinder"
+let count=`mongo duftfinder --eval "printjson(db.Role.count());" --quiet`
+echo $count
+
+
+
+echo "verifiying if $count is equal to 0"
+if [ "$count" == "0" ]
+then
+    #sleep 3s
+    echo "initializing database duftfinder"
+    #mongo duftfinder --eval 'var document = {name  : "document_name",title : "document_title",};db.Upsala.insert(document);'
+    rm -d -r -f setup
+    git clone https://github.com/flozi76/vagrant-linux-docker-vm.git setup
+
+
+    #sleep 5s
+    FILES=setup/DuftfinderData/*
+
+    #cd setup/DuftfinderData
+    for f in $FILES
+    do
+        #echo "Importing $f file to mongodb"
+
+        fullfilename=$f
+        filename=$(basename "$fullfilename")
+        fname="${filename%.*}"
+        ext="${filename##*.}"
+
+        echo $filename
+        echo $fname
+        #echo $ext
+        echo "importing file $f to collection $fname... "
+        mongoimport --db duftfinder --collection "$fname" --drop --file "$f"
+
+    # take action on each file. $f store current file name
+    #cat $f
+    done
+
+    rm -d -r -f setup
+else
+    echo "database duftfinder allready initialized"    
+fi
 
 
 
