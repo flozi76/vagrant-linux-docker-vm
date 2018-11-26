@@ -84,6 +84,7 @@ echo $count
 
 
 echo "verifiying if $count is equal to 0"
+# $count = 0
 if [ "$count" == "0" ]
 then
     #sleep 3s
