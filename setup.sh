@@ -122,7 +122,22 @@ else
     echo "database duftfinder allready initialized"    
 fi
 
+echo "**************** initializing duftfinder.web *******************"
 
+    rm -d -r -f Praxis
+    git clone https://github.com/flozi76/Praxis.git Praxis
+    cd Praxis/Duftfinder.Core/
+echo "****************** building docker *************************"
+    docker rm duftfinder.web
+echo "****************** building docker *************************"
+    docker build -t duftfinder.web .
+
+echo "***************** running docker *********************"    
+    docker run -d -p 8080:80 --name duftfinder.web duftfinder.web
+
+cd ..
+cd ..
+rm -d -r -f Praxis
 
 #echo ******** install minikube ***********
 #

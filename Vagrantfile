@@ -11,6 +11,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_url = "https://app.vagrantup.com/ubuntu/boxes/xenial64"
   
   config.vm.network "forwarded_port", guest: 27017, host: 27017
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
   config.vm.provider "virtualbox" do |v|
 		v.memory = 8196
         v.cpus = 2
